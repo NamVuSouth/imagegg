@@ -31,7 +31,7 @@
         const q = document.getElementById("searchInput").value;
         if (!q) return alert("Nhập từ khóa!");
 
-        const res = await fetch(`/search?q=${q}`);
+        const res = await fetch(`/public/search?q=${q}`);
         const data = await res.json();
 
         const container = document.getElementById("results");
@@ -49,3 +49,4 @@
 
 </body>
 </html>
+
