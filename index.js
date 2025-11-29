@@ -1,37 +1,23 @@
-const express = require('express');
-const axios = require('axios');
-const cors = require('cors');
+async function searchImages() {
+  const query = document.getElementById('query').value;
+  if (!query) return;
 
-const app = express();
-const port = 3000;
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = 'Loading...';
 
-const ACCESS_KEY = '8-MO3XwkgvCcowGZRtBKPVJuE9PY9GRp2d792L7AJ_Q';
+  try {
+    const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+    const data = await res.json();
 
-app.use(cors());
-app.use(express.static('public'));
-
-app.get('/search', async (req, res) => {
-    const query = req.query.q;
-    if (!query) {
-        return res.status(400).json({ error: 'Missing query parameter q' });
+    if (data.results) {
+      resultsDiv.innerHTML = data.results
+        .map(img => `<img src="${img.urls.small}" alt="${img.alt_description}">`)
+        .join('');
+    } else {
+      resultsDiv.innerHTML = 'No images found.';
     }
-
-    try {
-        const response = await axios.get('https://api.unsplash.com/search/photos', {
-            params: {
-                query,
-                per_page: 12,
-                client_id: ACCESS_KEY,
-            },
-        });
-
-        res.json(response.data);
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ error: 'Failed to fetch images' });
-    }
-});
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+  } catch (err) {
+    console.error(err);
+    resultsDiv.innerHTML = 'Error fetching images';
+  }
+}
