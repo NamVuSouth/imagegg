@@ -1,30 +1,21 @@
-import express from "express";
-import fetch from "node-fetch";
-import { createServer } from "@vercel/node";
+import axios from "axios";
 
-const app = express();
-
-app.get("/api/search", async (req, res) => {
+export default async function handler(req, res) {
     const query = req.query.q;
+    if (!query) return res.status(400).json({ error: 'Missing query parameter q' });
 
-    const apiKey = process.env.UNSPLASH_API_KEY;
+    try {
+        const response = await axios.get("https://api.unsplash.com/search/photos", {
+            params: {
+                query,
+                per_page: 12,
+                client_id: process.env.UNSPLASH_ACCESS_KEY
+            }
+        });
 
-    const result = await fetch(
-        `https://api.unsplash.com/search/photos?query=${query}&client_id=${apiKey}`
-    );
-
-    const data = await result.json();
-
-    res.json(data);
-});
-
-// 👇 Export serverless handler
-export default createServer(app);
-
-
-
-
-
-
-
-
+        return res.status(200).json(response.data);
+    } catch (err) {
+        console.error("API error:", err.message);
+        return res.status(500).json({ error: "Failed to fetch images" });
+    }
+}
