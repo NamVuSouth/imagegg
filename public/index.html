@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+<div class="max-w-3xl mx-auto py-10">
+    <h1 class="text-4xl font-bold text-center mb-6">Unsplash Image Search</h1>
+
+    <!-- Search box -->
+    <div class="flex gap-3 justify-center mb-8">
+        <input id="searchInput"
+               type="text"
+               placeholder="Search images..."
+               class="border px-4 py-2 rounded w-2/3 shadow">
+        <button onclick="searchImages()"
+                class="bg-blue-600 text-white px-4 py-2 rounded shadow">
+            Search
+        </button>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="grid grid-cols-3 gap-4"></div>
+</div>
+
+<script>
+    async function searchImages() {
+        const q = document.getElementById("searchInput").value;
+        if (!q) return alert("Nhập từ khóa!");
+
+        const res = await fetch(`/search?q=${q}`);
+        const data = await res.json();
+
+        const container = document.getElementById("results");
+        container.innerHTML = "";
+
+        data.results.forEach(img => {
+            const item = `
+        <div>
+          <img src="${img.urls.small}" class="rounded shadow">
+        </div>`;
+            container.innerHTML += item;
+        });
+    }
+</script>
+
+</body>
+</html>
