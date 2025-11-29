@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 const ACCESS_KEY = '8-MO3XwkgvCcowGZRtBKPVJuE9PY9GRp2d792L7AJ_Q';
 
@@ -23,3 +23,5 @@ export default async function handler(req, res) {
         res.status(500).json({ error: 'Failed to fetch images' });
     }
 }
+
+
