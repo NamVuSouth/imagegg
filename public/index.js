@@ -6,7 +6,7 @@ async function searchImages() {
   resultsDiv.innerHTML = 'Loading...';
 
   try {
-    const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+    const res = await fetch(`/public/search?q=${encodeURIComponent(query)}`);
     const data = await res.json();
 
     if (data.results) {
