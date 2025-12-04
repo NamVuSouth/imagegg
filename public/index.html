@@ -64,7 +64,6 @@
         });
     }
 
- 
 async function uploadImages() {
     const input = document.getElementById("uploadInput");
     const errorBox = document.getElementById("uploadError");
@@ -83,35 +82,48 @@ async function uploadImages() {
         formData.append("images", file);
     }
 
+    let res, body;
     try {
-        const res = await fetch("/api/upload", {
+        res = await fetch("/api/upload", {
             method: "POST",
             body: formData
         });
-
-        const data = await res.json();
-
-        if (data.error) {
-            errorBox.textContent = data.error;
-            return;
-        }
-
-        data.images.forEach(img => {
-            resultBox.innerHTML += `
-                <div><img src="${img}" class="rounded shadow"></div>
-            `;
-        });
-
-    } catch (e) {
-        errorBox.textContent = "Upload failed.";
+    } catch (networkErr) {
+        console.error("Network error:", networkErr);
+        errorBox.textContent = "Network error: " + networkErr.message;
+        return;
     }
+
+    const text = await res.text().catch(() => null);
+
+    try {
+        body = text ? JSON.parse(text) : null;
+    } catch (e) {
+        body = { raw: text };
+    }
+
+    if (!res.ok) {
+        // show server error message if present
+        const msg = (body && (body.error || body.message)) || `HTTP ${res.status}`;
+        console.error("Upload error response:", res.status, body);
+        errorBox.textContent = "Upload failed: " + msg;
+        return;
+    }
+
+    // Success
+    const images = body.images || [];
+    images.forEach(img => {
+        resultBox.innerHTML += `
+            <div><img src="${img.url}" class="rounded shadow"></div>
+        `;
+    });
 }
-
-
 </script>
+
 
 </body>
 </html>
+
 
 
 
