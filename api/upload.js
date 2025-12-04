@@ -1,6 +1,12 @@
 import multer from "multer";
 import path from "path";
+import nextConnect from "next-connect";
 
+export const config = {
+  api: {
+    bodyParser: false, // CỰC QUAN TRỌNG CHO MULTER TRÊN VERCEL
+  },
+};
 // cấu hình lưu bộ nhớ tạm (Vercel không có filesystem permanent)
 const storage = multer.memoryStorage();
 
