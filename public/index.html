@@ -22,6 +22,24 @@
         </button>
     </div>
 
+    <h2 class="text-2xl font-semibold mb-3">Upload PNG Images</h2>
+
+<form id="uploadForm" class="flex flex-col gap-3 mb-6" enctype="multipart/form-data">
+    <input type="file" id="uploadInput" name="images" accept="image/png" multiple
+           class="border p-2 rounded">
+
+    <button type="button"
+            onclick="uploadImages()"
+            class="bg-green-600 text-white px-4 py-2 rounded">
+        Upload
+    </button>
+</form>
+
+<p id="uploadError" class="text-red-600 font-semibold"></p>
+
+<div id="uploadResult" class="grid grid-cols-3 gap-4"></div>
+
+
     <!-- Results -->
     <div id="results" class="grid grid-cols-3 gap-4"></div>
 </div>
@@ -45,9 +63,55 @@
             container.innerHTML += item;
         });
     }
+
+ 
+async function uploadImages() {
+    const input = document.getElementById("uploadInput");
+    const errorBox = document.getElementById("uploadError");
+    const resultBox = document.getElementById("uploadResult");
+
+    errorBox.textContent = "";
+    resultBox.innerHTML = "";
+
+    if (input.files.length === 0) {
+        errorBox.textContent = "Please select at least one PNG image.";
+        return;
+    }
+
+    const formData = new FormData();
+    for (const file of input.files) {
+        formData.append("images", file);
+    }
+
+    try {
+        const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+            errorBox.textContent = data.error;
+            return;
+        }
+
+        data.images.forEach(img => {
+            resultBox.innerHTML += `
+                <div><img src="${img}" class="rounded shadow"></div>
+            `;
+        });
+
+    } catch (e) {
+        errorBox.textContent = "Upload failed.";
+    }
+}
+
+
 </script>
 
 </body>
 </html>
+
 
 
